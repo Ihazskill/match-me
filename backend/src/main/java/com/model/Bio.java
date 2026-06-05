@@ -50,7 +50,6 @@ public class Bio {
     @Column
     private String personality;
 
-    // Location - Fixed: now using com.model.Location
     @ManyToOne
     @JoinColumn(name = "location_id")
     private com.model.Location location;
