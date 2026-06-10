@@ -1,54 +1,76 @@
 package com.controller;
 
+import com.dto.AuthRequest;
+import com.dto.AuthResponse;
 import com.model.User;
-import com.repository.UserRepository;
 import com.security.JwtUtil;
+import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    PasswordEncoder encoder;
+    private UserService userService;
 
     @Autowired
-    JwtUtil jwtUtils;
+    private JwtUtil jwtUtil;
 
     @PostMapping("/signin")
-    public String authenticateUser(@RequestBody User user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),  // Changed from getUsername() to getEmail()
-                        user.getPassword()
-                )
-        );
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtils.generateToken(userDetails.getUsername());
+    public ResponseEntity<?> authenticateUser(@RequestBody AuthRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String token = jwtUtil.generateToken(userDetails.getUsername());
+
+            // Get user info
+            User user = userService.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            AuthResponse response = new AuthResponse(
+                    token,
+                    user.getId(),
+                    user.getEmail(),
+                    user.isProfileCompleted()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(401).body("Invalid email or password");
+        }
     }
 
     @PostMapping("/signup")
-    public String registerUser(@RequestBody User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {  // Changed from existsByUsername
-            return "Error: Email is already taken!";
+    public ResponseEntity<?> registerUser(@RequestBody AuthRequest request) {
+        try {
+            User user = userService.createUser(request.getEmail(), request.getPassword());
+            String token = jwtUtil.generateToken(user.getEmail());
+
+            AuthResponse response = new AuthResponse(
+                    token,
+                    user.getId(),
+                    user.getEmail(),
+                    user.isProfileCompleted()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        // Create new user's account
-        User newUser = new User();
-        newUser.setEmail(user.getEmail());  // Changed from setUsername
-        newUser.setPassword(encoder.encode(user.getPassword()));
-
-        userRepository.save(newUser);
-        return "User registered successfully!";
     }
 }
