@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -12,9 +12,22 @@ const BioSetup = () => {
   const [lifestyle, setLifestyle] = useState("");
   const [personality, setPersonality] = useState("");
   const [lookingFor, setLookingFor] = useState("");
-  const [seekingInterests, setSekingInterests] = useState("");
-  const [locationId, setLocationId] = useState("1");
+  const [seekingInterests, setSeekingInterests] = useState("");
+  const [locationId, setLocationId] = useState("");
+  const [locations, setLocations] = useState<any[]>([]);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const res = await api.get("/locations");
+        setLocations(res.data);
+      } catch (err) {
+        setLocations([]);
+      }
+    };
+    fetchLocations();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,20 +187,26 @@ const BioSetup = () => {
           <input
             type="text"
             value={seekingInterests}
-            onChange={(e) => setSekingInterests(e.target.value)}
+            onChange={(e) => setSeekingInterests(e.target.value)}
             style={{ width: "100%", padding: "8px" }}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
-          <label>Location ID</label>
+          <label>Your City</label>
           <br />
-          <input
-            type="number"
+          <select
             value={locationId}
             onChange={(e) => setLocationId(e.target.value)}
             required
             style={{ width: "100%", padding: "8px" }}
-          />
+          >
+            <option value="">Select your city...</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.id}>
+                {loc.city}, {loc.country}
+              </option>
+            ))}
+          </select>
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit" style={{ width: "100%", padding: "10px" }}>

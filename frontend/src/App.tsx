@@ -62,6 +62,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/recommendations"
+          element={
+            <ProtectedRoute>
+              <div style={{ padding: "20px" }}>Recommendations coming soon</div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/connections"
+          element={
+            <ProtectedRoute>
+              <div style={{ padding: "20px" }}>Connections coming soon</div>
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

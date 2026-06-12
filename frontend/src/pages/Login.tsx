@@ -14,7 +14,7 @@ const Login = () => {
     try {
       const response = await api.post("/auth/signin", { email, password });
       localStorage.setItem("token", response.data.token);
-      localStorage.setItem("userId", response.data.id);
+      localStorage.setItem("userId", response.data.userId);
       if (response.data.profileCompleted) {
         navigate("/recommendations");
       } else {
