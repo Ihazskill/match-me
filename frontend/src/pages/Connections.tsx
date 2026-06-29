@@ -13,7 +13,7 @@ export default function Connections() {
 
         const full = await Promise.all(
             res.data.map(async (c: any) => {
-                const user = await axios.get(`/user/${c.id}`);
+                const user = await axios.get(`/users/${c.id}`);
                 return user.data;
             })
         );
