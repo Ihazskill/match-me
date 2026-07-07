@@ -138,16 +138,10 @@ const EditProfile = () => {
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
-          <label>Profile Picture URL</label>
+          <label>Profile Picture</label>
           <br />
-          <input
-            type="text"
-            value={profilePictureUrl}
-            onChange={(e) => setProfilePictureUrl(e.target.value)}
-            style={{ width: "100%", padding: "8px" }}
-          />
-          {profilePictureUrl && (
-            <div style={{ marginTop: "10px" }}>
+          <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+            {profilePictureUrl ? (
               <img
                 src={profilePictureUrl}
                 alt="Preview"
@@ -158,22 +152,52 @@ const EditProfile = () => {
                   objectFit: "cover",
                 }}
               />
-              <button
-                type="button"
-                onClick={() => setProfilePictureUrl("")}
+            ) : (
+              <div
                 style={{
-                  marginLeft: "10px",
-                  padding: "5px 10px",
-                  backgroundColor: "#e74c3c",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "50%",
+                  backgroundColor: "#eee",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "36px",
                 }}
               >
-                Remove Picture
-              </button>
-            </div>
+                👤
+              </div>
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setProfilePictureUrl(reader.result as string);
+              };
+              reader.readAsDataURL(file);
+            }}
+          />
+          {profilePictureUrl && (
+            <button
+              type="button"
+              onClick={() => setProfilePictureUrl("")}
+              style={{
+                marginLeft: "10px",
+                padding: "5px 10px",
+                backgroundColor: "#e74c3c",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Remove Picture
+            </button>
           )}
         </div>
         <hr />
