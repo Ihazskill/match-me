@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.dto.UserBasicDTO;
 import com.dto.UserBioDTO;
 import com.dto.UserProfileDTO;
 import com.model.Bio;
@@ -47,11 +48,11 @@ public class UserController {
         if (profile == null) {
             return ResponseEntity.notFound().build();
         }
-        UserProfileDTO dto = new UserProfileDTO(
+        UserBasicDTO dto = new UserBasicDTO(
                 user.getId(),
                 profile.getFirstName(),
                 profile.getLastName(),
-                profile.getAboutMe(),
+                profile.getProfilePictureUrl(),
                 profile.getAge()
         );
         return ResponseEntity.ok(dto);
@@ -70,7 +71,14 @@ public class UserController {
         if (profile == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(profile);
+        UserProfileDTO dto = new UserProfileDTO(
+            user.getId(),
+            profile.getFirstName(),
+            profile.getLastName(),
+            profile.getAboutMe(),
+            profile.getAge()
+        );
+        return ResponseEntity.ok(dto);
     }
 
     /**

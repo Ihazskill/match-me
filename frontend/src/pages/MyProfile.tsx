@@ -4,6 +4,7 @@ import api from "../api/axios";
 
 const MyProfile = () => {
   const navigate = useNavigate();
+  const [basic, setBasic] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [bio, setBio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -12,8 +13,10 @@ const MyProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        const basicRes = await api.get("/me");
         const profileRes = await api.get("/me/profile");
         const bioRes = await api.get("/me/bio");
+        setBasic(basicRes.data);
         setProfile(profileRes.data);
         setBio(bioRes.data);
       } catch (err: any) {
@@ -35,9 +38,9 @@ const MyProfile = () => {
 
       {/* Profile Picture */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        {profile?.profilePictureUrl ? (
+        {basic?.profilePictureUrl ? (
           <img
-            src={profile.profilePictureUrl}
+            src={basic.profilePictureUrl}
             alt="Profile"
             style={{
               width: "120px",

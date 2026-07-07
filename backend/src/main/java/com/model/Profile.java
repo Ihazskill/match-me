@@ -30,7 +30,7 @@ public class Profile {
     @Column(columnDefinition = "TEXT")
     private String aboutMe;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String profilePictureUrl;
 
     @Column
