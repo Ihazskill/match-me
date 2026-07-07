@@ -1,15 +1,20 @@
-import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import ProfileSetup from "./pages/ProfileSetup";
-import BioSetup from "./pages/BioSetup";
-import MyProfile from "./pages/MyProfile";
-import EditProfile from "./pages/EditProfile";
-import Navbar from "./components/Navbar";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProfileSetup from './pages/ProfileSetup';
+import BioSetup from './pages/BioSetup';
+import MyProfile from './pages/MyProfile';
+import EditProfile from './pages/EditProfile';
+import Recommendations from './pages/Recommendations';
+import Connections from './pages/Connections';
+import ConnectionRequests from './pages/ConnectionRequests';
+import UserProfileView from './pages/UserProfileView';
+import Navbar from './components/Navbar';
 
 const isLoggedIn = () => {
-  return localStorage.getItem("token") !== null;
+  return localStorage.getItem('token') !== null;
 };
 
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
@@ -63,10 +68,18 @@ function App() {
           }
         />
         <Route
+          path="/users/:id"
+          element={
+            <ProtectedRoute>
+              <UserProfileView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/recommendations"
           element={
             <ProtectedRoute>
-              <div style={{ padding: "20px" }}>Recommendations coming soon</div>
+              <Recommendations />
             </ProtectedRoute>
           }
         />
@@ -74,7 +87,15 @@ function App() {
           path="/connections"
           element={
             <ProtectedRoute>
-              <div style={{ padding: "20px" }}>Connections coming soon</div>
+              <Connections />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/connections/requests"
+          element={
+            <ProtectedRoute>
+              <ConnectionRequests />
             </ProtectedRoute>
           }
         />
