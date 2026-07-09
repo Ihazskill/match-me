@@ -8,6 +8,7 @@ interface UserBasic {
   lastName: string;
   profilePictureUrl: string | null;
   age: number;
+  online: boolean;
 }
 
 interface UserProfile {
@@ -90,34 +91,48 @@ const UserProfileView: React.FC = () => {
   return (
     <div style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
       <div style={{ textAlign: "center" }}>
-        {basic.profilePictureUrl ? (
-          <img
-            src={basic.profilePictureUrl}
-            alt={`${basic.firstName} ${basic.lastName}`}
+        <div style={{ position: "relative", display: "inline-block" }}>
+          {basic.profilePictureUrl ? (
+            <img
+              src={basic.profilePictureUrl}
+              alt={`${basic.firstName} ${basic.lastName}`}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                backgroundColor: "#eee",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 60,
+              }}
+            >
+              👤
+            </div>
+          )}
+          <span
             style={{
-              width: 150,
-              height: 150,
+              position: "absolute",
+              bottom: "10px",
+              right: "10px",
+              width: "22px",
+              height: "22px",
               borderRadius: "50%",
-              objectFit: "cover",
+              backgroundColor: basic.online ? "#2ecc71" : "#bbb",
+              border: "3px solid white",
             }}
+            title={basic.online ? "Online" : "Offline"}
           />
-        ) : (
-          <div
-            style={{
-              width: 150,
-              height: 150,
-              borderRadius: "50%",
-              backgroundColor: "#eee",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 60,
-              margin: "0 auto",
-            }}
-          >
-            👤
-          </div>
-        )}
+        </div>
         <h2>
           {basic.firstName} {basic.lastName}
         </h2>

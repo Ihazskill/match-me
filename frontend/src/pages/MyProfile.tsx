@@ -38,20 +38,35 @@ const MyProfile = () => {
 
       {/* Profile Picture */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        {basic?.profilePictureUrl ? (
-          <img
-            src={basic.profilePictureUrl}
-            alt="Profile"
+        <div style={{ position: "relative", display: "inline-block" }}>
+          {basic?.profilePictureUrl ? (
+            <img
+              src={basic.profilePictureUrl}
+              alt="Profile"
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div style={{ fontSize: "80px" }}>👤</div>
+          )}
+          <span
             style={{
-              width: "120px",
-              height: "120px",
+              position: "absolute",
+              bottom: "8px",
+              right: "8px",
+              width: "18px",
+              height: "18px",
               borderRadius: "50%",
-              objectFit: "cover",
+              backgroundColor: basic?.online ? "#2ecc71" : "#bbb",
+              border: "2px solid white",
             }}
+            title={basic?.online ? "Online" : "Offline"}
           />
-        ) : (
-          <div style={{ fontSize: "80px" }}>👤</div>
-        )}
+        </div>
       </div>
 
       {/* Basic Info */}

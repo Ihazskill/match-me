@@ -4,8 +4,10 @@ import com.dto.UserBasicDTO;
 import com.dto.UserBioDTO;
 import com.dto.UserProfileDTO;
 import com.model.Bio;
+import com.model.Connection;
 import com.model.Profile;
 import com.model.User;
+import com.repository.ConnectionRepository;
 import com.service.ProfileService;
 import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private ConnectionRepository connectionRepository;
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserBasicInfo(@PathVariable Long userId) {
@@ -49,11 +53,12 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         UserBasicDTO dto = new UserBasicDTO(
-                user.getId(),
-                profile.getFirstName(),
-                profile.getLastName(),
-                profile.getProfilePictureUrl(),
-                profile.getAge()
+            user.getId(),
+            profile.getFirstName(),
+            profile.getLastName(),
+            profile.getProfilePictureUrl(),
+            profile.getAge(),
+            user.isOnline()
         );
         return ResponseEntity.ok(dto);
     }
@@ -91,6 +96,102 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         Bio bio = profileService.getBio(user.getId()).orElse(null);
+        if (bio == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserBioDTO dto = new UserBioDTO(
+                bio.getId(),
+                bio.getInterests(),
+                bio.getHobbies(),
+                bio.getMusicTaste(),
+                bio.getFoodPreference(),
+                bio.getTravelStyle(),
+                bio.getLifestyle(),
+                bio.getPersonality(),
+                bio.getLocation() != null ? bio.getLocation().getCity() : null,
+                bio.getLookingFor(),
+                bio.getSeekingInterests(),
+                bio.getSeekingLocation() != null ? bio.getSeekingLocation().getCity() : null
+        );
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Checks if the viewer is allowed to see the target user's profile.
+     * Per spec: viewable only if recommended, pending request, or connected.
+     * TODO: "recommended" check not yet implemented — needs RecommendationService
+     * to expose a method like isRecommendedFor(viewer, target).
+     */
+    private boolean canView(User viewer, User target) {
+        if (viewer.getId().equals(target.getId())) {
+            return true;
+        }
+        return connectionRepository.findConnectionBetweenUsers(viewer, target)
+                .map(c -> c.getStatus() == Connection.ConnectionStatus.PENDING
+                        || c.getStatus() == Connection.ConnectionStatus.ACCEPTED)
+                .orElse(false);
+    }
+
+    /**
+     * Returns another user's basic info (name, picture) — if viewer has permission.
+     */
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id, Principal principal) {
+        User viewer = userService.findByEmail(principal.getName()).orElse(null);
+        User target = userService.findById(id).orElse(null);
+        if (viewer == null || target == null || !canView(viewer, target)) {
+            return ResponseEntity.notFound().build();
+        }
+        Profile profile = profileService.getProfile(target.getId()).orElse(null);
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserBasicDTO dto = new UserBasicDTO(
+            target.getId(),
+            profile.getFirstName(),
+            profile.getLastName(),
+            profile.getProfilePictureUrl(),
+            profile.getAge(),
+            target.isOnline()
+        );
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Returns another user's "about me" info — if viewer has permission.
+     */
+    @GetMapping("/users/{id}/profile")
+    public ResponseEntity<?> getUserProfileById(@PathVariable Long id, Principal principal) {
+        User viewer = userService.findByEmail(principal.getName()).orElse(null);
+        User target = userService.findById(id).orElse(null);
+        if (viewer == null || target == null || !canView(viewer, target)) {
+            return ResponseEntity.notFound().build();
+        }
+        Profile profile = profileService.getProfile(target.getId()).orElse(null);
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
+        UserProfileDTO dto = new UserProfileDTO(
+                target.getId(),
+                profile.getFirstName(),
+                profile.getLastName(),
+                profile.getAboutMe(),
+                profile.getAge()
+        );
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Returns another user's biographical/matching data — if viewer has permission.
+     */
+    @GetMapping("/users/{id}/bio")
+    public ResponseEntity<?> getUserBioById(@PathVariable Long id, Principal principal) {
+        User viewer = userService.findByEmail(principal.getName()).orElse(null);
+        User target = userService.findById(id).orElse(null);
+        if (viewer == null || target == null || !canView(viewer, target)) {
+            return ResponseEntity.notFound().build();
+        }
+        Bio bio = profileService.getBio(target.getId()).orElse(null);
         if (bio == null) {
             return ResponseEntity.notFound().build();
         }

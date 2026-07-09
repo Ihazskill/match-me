@@ -1,15 +1,20 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
+import api from "../api/axios";
 
 const Navbar = () => {
   const navigate = useNavigate();
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/signout");
+    } catch (err) {
+      // even if this fails, still log the user out locally
+      console.error("Failed to update online status on logout", err);
+    }
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     navigate("/login");
   };
-
   return (
     <nav
       style={{
@@ -57,5 +62,4 @@ const Navbar = () => {
     </nav>
   );
 };
-
 export default Navbar;

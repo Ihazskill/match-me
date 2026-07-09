@@ -1,5 +1,4 @@
 package com.dto;
-
 import lombok.*;
 
 @Getter
@@ -13,4 +12,5 @@ public class UserBasicDTO {
     private String lastName;
     private String profilePictureUrl;
     private Integer age;
+    private Boolean online;
 }
