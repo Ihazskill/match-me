@@ -2,6 +2,8 @@ package com.controller;
 
 import com.dto.BioUpdateRequest;
 import com.dto.ProfileUpdateRequest;
+import com.dto.UserProfileDTO;
+import com.dto.UserBioDTO;
 import com.model.Bio;
 import com.model.Profile;
 import com.model.User;
@@ -43,7 +45,14 @@ public class ProfileController {
                 request.getProfilePictureUrl()
         );
 
-        return ResponseEntity.ok(profile);
+        UserProfileDTO dto = new UserProfileDTO(
+                user.getId(),
+                profile.getFirstName(),
+                profile.getLastName(),
+                profile.getAboutMe(),
+                profile.getAge()
+        );
+        return ResponseEntity.ok(dto);
     }
 
     /**
@@ -73,6 +82,20 @@ public class ProfileController {
                 request.getSeekingLocationId()
         );
 
-        return ResponseEntity.ok(bio);
+        UserBioDTO dto = new UserBioDTO(
+                bio.getId(),
+                bio.getInterests(),
+                bio.getHobbies(),
+                bio.getMusicTaste(),
+                bio.getFoodPreference(),
+                bio.getTravelStyle(),
+                bio.getLifestyle(),
+                bio.getPersonality(),
+                bio.getLocation() != null ? bio.getLocation().getCity() : null,
+                bio.getLookingFor(),
+                bio.getSeekingInterests(),
+                bio.getSeekingLocation() != null ? bio.getSeekingLocation().getCity() : null
+        );
+        return ResponseEntity.ok(dto);
     }
 }

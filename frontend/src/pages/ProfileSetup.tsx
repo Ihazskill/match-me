@@ -24,7 +24,10 @@ const ProfileSetup = () => {
       });
       navigate("/profile/bio");
     } catch (err: any) {
-      setError(err.response?.data || "Failed to save profile");
+      const data = err.response?.data;
+      const msg =
+        typeof data === "string" ? data : data?.message || data?.error;
+      setError(msg || "Failed to save profile");
     }
   };
 
